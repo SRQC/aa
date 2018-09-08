@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.zb.dao.UsersDao">
+	
+	<resultMap type="Users" id="umap">
+		<result property="id" column="id"/>
+		<result property="smbid" column="smb_id"/>
+		<result property="usercode" column="usercode"/>
+		<result property="username" column="username"/>
+		<result property="userpassword" column="userpassword"/>
+		<result property="gender" column="gender"/>
+		<result property="birthday" column="birthday"/>
+		<result property="phone" column="phone"/>
+		<result property="address" column="address"/>
+		<result property="cardphoto" column="cardphoto"/>
+		<result property="workphoto" column="workphoto"/>
+		<association property="role" javaType="Role">
+			<result property="id" column="rid"/>
+			<result property="rolename" column="rolename"/>
+		</association>
+	
+	</resultMap>
+	<select id="login" resultType="Users">
+		select * from smbms_user where username=#{username} and userpassword=#{password}
+	</select>
+	
+	<select id="findUsers" resultMap="umap" parameterType="map">
+		SELECT u.*,r.id rid,r.rolename FROM smbms_user u INNER JOIN smbms_role r ON u.userroleid=r.id
+		<if test="queryname!=null">
+			and u.username like concat('%',#{queryname},'%')
+		</if>
+		<if test="queryUserRole!=null">
+			and r.id=#{queryUserRole}
+		</if>
+		limit #{start},#{size}
+	</select>
+	
+	<select id="findUsersCount" resultType="int" parameterType="map">
+		SELECT count(1) FROM smbms_user u INNER JOIN smbms_role r ON u.userroleid=r.id
+		<if test="queryname!=null">
+			and u.username like concat('%',#{queryname},'%')
+		</if>
+		<if test="queryUserRole!=null">
+			and r.id=#{queryUserRole}
+		</if>
+	</select>
+	
+	<insert id="addUsers" parameterType="Users">
+		INSERT INTO smbms_user(usercode,username,userpassword,gender,birthday,phone,address,userroleid,
+		createby,creationdate,cardphoto,workphoto) 
+		VALUES
+		(#{usercode},#{username},#{userpassword},#{gender},#{birthday},#{phone},#{address},#{role.id},#{createby},#{creationdate},#{cardphoto},#{workphoto});
+		
+	</insert>
+	
+	<select id="findById" parameterType="int" resultMap="umap">
+		SELECT u.*,r.id rid,r.rolename FROM smbms_user u INNER JOIN smbms_role r ON u.userroleid=r.id and u.id=#{id}
+	</select>
+
+	<update id="updateUsers" parameterType="Users">
+		update smbms_user set username=#{username},gender=#{gender},birthday=#{birthday},
+		phone=#{phone},address=#{address},userroleid=#{role.id},cardphoto=#{cardphoto},
+		workphoto=#{workphoto} where id=#{id}
+	</update>
+	
+	<delete id="deleteUsers" parameterType="int">
+		delete from smbms_user where id=#{id}
+	</delete>
+	
+	
+	<select id="checkCode" parameterType="string" resultType="int">
+		select count(1) from smbms_user where usercode=#{code}
+	</select>
+	<update id="updatePwd" parameterType="Users">
+	 	update smbms_user set userpassword=#{userpassword},
+	 	modifyby =#{modifyby},modifydate=#{modifydate} where id=#{id} 
+	</update>
+</mapper>

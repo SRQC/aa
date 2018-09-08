@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.zb.dao.BillDao">
+	
+	<resultMap type="Bill" id="bmap">
+		<result property="id" column="id"/>
+		<result property="billcode" column="billcode"/>
+		<result property="productname" column="productname"/>
+		<result property="productdesc" column="productdesc"/>
+		<result property="productunit" column="productunit"/>
+		<result property="productcount" column="productcount"/>
+		<result property="totalprice" column="totalprice"/>
+		<result property="ispayment" column="ispayment"/>
+		<result property="createby" column="createby"/>
+		<result property="creationdate" column="creationdate"/>
+		<result property="modifyby" column="modifyby"/>
+		<result property="modifydate" column="modifydate"/>
+		<association property="provider" javaType="Provider">
+			<result property="id" column="pid"/>
+			<result property="proname" column="proname"/>
+		</association>
+	
+	</resultMap>
+	<!-- 查询订单，模糊查询，分页 -->
+	<select id="findBill" resultMap="bmap" parameterType="map">
+		select b.*,p.id pid,p.proname from smbms_bill b inner join smbms_provider p on b.providerid=p.id
+		<if test="queryProductName != null">
+			and b.productname like concat('%',#{queryProductName},'%')
+		</if>
+		<if test="queryProviderId != null">
+			and p.id =#{queryProviderId}
+		</if>
+		<if test="queryIsPayment != null">
+			and b.ispayment =#{queryIsPayment}
+		</if>
+		
+		limit #{start},#{size}
+		
+	</select>
+
+
+	<select id="findBillCount" resultType="int" parameterType="map">
+		select count(1) from smbms_bill b inner join smbms_provider p on b.providerid=p.id
+		<if test="queryProductName != null">
+			and b.productname like '%' #{queryProductName} '%'
+		</if>
+		<if test="queryProviderId != null">
+			and p.id =#{queryProviderId}
+		</if>
+		<if test="queryIsPayment != null">
+			and b.ispayment =#{queryIsPayment}
+		</if>
+	</select>
+	
+	
+	<insert id="add" parameterType="Bill">
+		insert into smbms_bill(billcode,productname,productunit,productcount,totalprice,ispayment,providerid,createby,creationdate)
+		 values (#{billcode},#{productname},#{productunit},#{productcount},#{totalprice},#{ispayment},#{provider.id},#{createby},#{creationdate})
+	</insert>
+	
+	
+	<select id="findId" resultMap="bmap" parameterType="int">
+		select b.*,p.id pid,p.proname from smbms_bill b inner join smbms_provider p on b.providerid=p.id and b.id=#{id}
+	</select>
+	
+	<update id="upd" parameterType="Bill">
+		update smbms_bill set productname=#{productname},productunit=#{productunit},totalprice=#{totalprice},
+		productcount=#{productcount},ispayment=#{ispayment},providerid=#{provider.id},modifyby=#{modifyby},
+		modifydate=#{modifydate} where id=#{id}
+	</update>
+	
+	
+	<delete id="del" parameterType="int">
+		delete from smbms_bill where id=#{id}
+	</delete>
+</mapper>

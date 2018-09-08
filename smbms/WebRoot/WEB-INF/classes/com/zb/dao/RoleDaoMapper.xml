@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.zb.dao.RoleDao">
+	
+	<select id="findRoles" resultType="Role">
+		select * from smbms_role
+	</select>
+	
+	<select id="findRoleCount" parameterType="int">
+		select count(1) from smbms_role
+		
+	</select>
+	
+	<select id="findById" resultType="Role" parameterType="int">
+		select * from smbms_role where id=#{id}
+	</select>
+	
+	<select id="checkCode" parameterType="string" resultType="int">
+		select count(1) from smbms_role where rolecode=#{code}
+	</select>
+	
+	<insert id="addRole" parameterType="Role">
+		insert into smbms_role(rolecode,rolename,createby,creationdate) 
+		values(#{rolecode},#{rolename},#{createby},#{creationdate})
+	</insert>
+	
+	<update id="updateRole" parameterType="Role">
+		update smbms_role set rolecode=#{rolecode},rolename=#{rolename},
+		modifyby=#{modifyby},modifydate=#{modifydate} where id=#{id}
+	</update>
+	
+	<delete id="deleteRole" parameterType="int">
+		delete from smbms_role where id=#{id}
+	</delete>
+</mapper>

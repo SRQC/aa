@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.zb.dao.ProviderDao">
+	
+	<select id="findProvider" resultType="Provider">
+		select * from smbms_provider
+	</select>
+	
+	<!-- 查询订单，模糊查询，分页 -->
+	<select id="findAllProvider" resultType="Provider" parameterType="map">
+		SELECT id,procode,proname,procontact,prophone,profax,creationdate FROM smbms_provider where 1=1 
+		<if test="queryProName != null">
+			and proname like concat('%',#{queryProName},'%')
+		</if>
+		<if test="queryProCode!=null">
+			and procode=#{queryProCode}
+		</if>
+		 limit #{start},#{size}
+		
+	</select>
+	
+	<select id="findProviderCount" resultType="int" parameterType="map">
+		SELECT count(1) FROM smbms_provider where 1=1 
+		<if test="queryProName != null">
+			and proname like concat('%',#{queryProName},'%')
+		</if>
+		<if test="queryProCode != null">
+			and procode=#{queryProCode}
+		</if>
+	</select>
+	
+	<select id="findId" resultType="Provider" parameterType="int">
+		select * from smbms_provider where id=#{id}
+	</select>
+	
+	<insert id="add" parameterType="Provider">
+		insert into smbms_provider(procode,proname,prodesc,procontact,prophone,proaddress,profax,createby,creationdate,cardphoto,workphoto)
+		 values (#{procode},#{proname},#{prodesc},#{procontact},#{prophone},#{proaddress},#{profax},#{createby},#{creationdate},#{cardphoto},#{workphoto})
+	</insert>
+	
+	<update id="upd" parameterType="Provider">
+		update smbms_provider set procode = #{procode} , proname = #{proname} , prodesc = #{prodesc},
+		procontact = #{procontact} , prophone = #{prophone} , proaddress = #{proaddress} , profax = #{profax} , modifyby = #{modifyby},
+		modifydate = #{modifydate} , cardphoto = #{cardphoto} ,workphoto = #{workphoto} where id=#{id}
+	</update>
+	
+	<delete id="del" parameterType="int">
+		delete from smbms_provider where id=#{id}
+	</delete>
+</mapper>
